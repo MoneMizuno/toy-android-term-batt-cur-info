@@ -265,7 +265,7 @@ if [ "$AWKCOMMEXIST" != 127 ]; then
 		do
 			if [ "$TEMPVALEFF" == 0 ]; then
 				BATTTEMP=`cat $SYSPOWPATH$BATTERYPATH$TEMPVAL`
-				expr "$BATTTEMP" > /dev/null 2>&1
+				expr "$BATTTEMP" + 1 > /dev/null 2>&1
 				BATTTEMPNONEXCEP=$?
 				if [ $BATTTEMPNONEXCEP == 0 ]; then
 					BATTTEMPC=$(($BATTTEMP/10))
@@ -299,7 +299,7 @@ if [ "$AWKCOMMEXIST" != 127 ]; then
 
 			if [ "$CURRENTVALEFF" == 0 ]; then
 				BATTCURRENT=`cat $SYSPOWPATH$BATTERYPATH$CURRENTVAL`
-				expr "$BATTCURRENT" > /dev/null 2>&1
+				expr "$BATTCURRENT" + 1 > /dev/null 2>&1
 				BATTCURRENTNONEXCEP=$?
 			else
 				BATTCURRENT=$NULL
@@ -330,7 +330,7 @@ if [ "$AWKCOMMEXIST" != 127 ]; then
 
 			if [ "$VOLTAGEVALEFF" == 0 ]; then
 				BATTVOLTAGE=`cat $SYSPOWPATH$BATTERYPATH$VOLTAGEVAL` 
-				expr "$BATTVOLTAGE" > /dev/null 2>&1
+				expr "$BATTVOLTAGE" + 1 > /dev/null 2>&1
 				BATTVOLTAGENONEXCEP=$?
 				if [ $BATTVOLTAGENONEXCEP == 0 ]; then
 					BATTVOLTAGEMV=$(($BATTVOLTAGE/1000))
@@ -344,7 +344,7 @@ if [ "$AWKCOMMEXIST" != 127 ]; then
 
 			if [ "$CAPACITYVALEFF" == 0 ]; then
 				BATTCAPACITY=`cat $SYSPOWPATH$BATTERYPATH$CAPACITYVAL`
-				expr "$BATTCAPACITY" > /dev/null 2>&1
+				expr "$BATTCAPACITY" + 1 > /dev/null 2>&1
 				BATTCAPACITYNONEXCEP=$?
 				if [ $BATTCAPACITYNONEXCEP != 0 ];then
 					BATTCAPACITY=$EXCEP
