@@ -50,6 +50,9 @@ if [ "$AWKCOMMEXIST" != 127 ]; then
 	EFFT=`echo -ne "\033[32mEFF\033[39m"`
 	NULT=`echo -ne "\033[31mNUL\033[39m"`
 
+	NULL=null
+	EXCEP=exception
+
 	# Check if the directory exists.
 
 	ls $SYSPOWPATH$BATTPATH > /dev/null 2>&1
@@ -262,67 +265,110 @@ if [ "$AWKCOMMEXIST" != 127 ]; then
 		do
 			if [ "$TEMPVALEFF" == 0 ]; then
 				BATTTEMP=`cat $SYSPOWPATH$BATTERYPATH$TEMPVAL`
-				BATTTEMPC=$(($BATTTEMP/10))
+				expr "$BATTTEMP" > /dev/null 2>&1
+				BATTTEMPNONEXCEP=$?
+				if [ $BATTTEMPNONEXCEP == 0 ]; then
+					BATTTEMPC=$(($BATTTEMP/10))
+				else
+					BATTTEMPC=$EXCEP
+				fi
 			else
-				BATTTEMPC=null
+				BATTTEMPC=$NULL
 			fi
-			
+
+
 			if [ "$STATUSVALEFF" == 0 ]; then
 				BATTSTATUS=`cat $SYSPOWPATH$BATTERYPATH$STATUSVAL`
+				if [ -z $BATTSTATUS ];then
+					BATTSTATUS=$EXCEP
+				fi
 			else
-				BATTSTATUS=null
+				BATTSTATUS=$NULL
 			fi
-			
+
+
 			if [ "$CHARGETYPEVALEFF" == 0 ]; then
 				BATTCHARGETYPE=`cat $SYSPOWPATH$BATTERYPATH$CHARGETYPEVAL`
+				if [ -z $BATTCHARGETYPE ];then
+					BATTCHARGETYPE=$EXCEP
+				fi
 			else
-				BATTCHARGETYPE=null
+				BATTCHARGETYPE=$NULL
 			fi
-			
+
 
 			if [ "$CURRENTVALEFF" == 0 ]; then
 				BATTCURRENT=`cat $SYSPOWPATH$BATTERYPATH$CURRENTVAL`
+				expr "$BATTCURRENT" > /dev/null 2>&1
+				BATTCURRENTNONEXCEP=$?
 			else
-				BATTCURRENT=null
+				BATTCURRENT=$NULL
 			fi
-			
-			if [ -n "$CURRENTFORMATVAL" ] && [ "$BATTCURRENT" != "null" ]; then
-				if [ "$CURRENTFORMATVAL" == "REVERSEMUA" ]; then
-					BATTCURRENTMA=$((-($BATTCURRENT/1000)))
-				elif [ "$CURRENTFORMATVAL" == "MUA" ]; then
-					BATTCURRENTMA=$(($BATTCURRENT/1000))
-				elif [ "$CURRENTFORMATVAL" == "REVERSEMA" ]; then
-					BATTCURRENTMA=$((-($BATTCURRENT)))
-				elif [ "$CURRENTFORMATVAL" == "MA" ]; then
-					BATTCURRENTMA=$BATTCURRENT
+
+
+			if [ -n "$CURRENTFORMATVAL" ] && [ "$BATTCURRENT" != "$NULL" ]; then
+				if [ $BATTCURRENTNONEXCEP == 0 ]; then
+					if [ "$CURRENTFORMATVAL" == "REVERSEMUA" ]; then
+						BATTCURRENTMA=$((-($BATTCURRENT/1000)))
+					elif [ "$CURRENTFORMATVAL" == "MUA" ]; then
+						BATTCURRENTMA=$(($BATTCURRENT/1000))
+					elif [ "$CURRENTFORMATVAL" == "REVERSEMA" ]; then
+						BATTCURRENTMA=$((-($BATTCURRENT)))
+					elif [ "$CURRENTFORMATVAL" == "MA" ]; then
+						BATTCURRENTMA=$BATTCURRENT
+					else
+						BATTCURRENTMA=$BATTCURRENT
+					fi
 				else
-					BATTCURRENTMA=$BATTCURRENT
+					BATTCURRENTMA=$EXCEP
 				fi
 			else
 				BATTCURRENTMA=$BATTCURRENT
 			fi
-			
+
+
+
 			if [ "$VOLTAGEVALEFF" == 0 ]; then
-				BATTVOLTAGE=`cat $SYSPOWPATH$BATTERYPATH$VOLTAGEVAL`
-				BATTVOLTAGEMV=$(($BATTVOLTAGE/1000))
+				BATTVOLTAGE=`cat $SYSPOWPATH$BATTERYPATH$VOLTAGEVAL` 
+				expr "$BATTVOLTAGE" > /dev/null 2>&1
+				BATTVOLTAGENONEXCEP=$?
+				if [ $BATTVOLTAGENONEXCEP == 0 ]; then
+					BATTVOLTAGEMV=$(($BATTVOLTAGE/1000))
+				else
+					BATTVOLTAGEMV=$EXCEP
+				fi
 			else
-				BATTVOLTAGEMV=null
+				BATTVOLTAGEMV=$NULL
 			fi
-			
+
+
 			if [ "$CAPACITYVALEFF" == 0 ]; then
 				BATTCAPACITY=`cat $SYSPOWPATH$BATTERYPATH$CAPACITYVAL`
+				expr "$BATTCAPACITY" > /dev/null 2>&1
+				BATTCAPACITYNONEXCEP=$?
+				if [ $BATTCAPACITYNONEXCEP != 0 ];then
+					BATTCAPACITY=$EXCEP
+				fi
 			else
-				BATTCAPACITY=null
+				BATTCAPACITY=$NULL
 			fi
-			
-			if [ "$BATTTEMPC" -ge 45 ]; then
+
+
+
+			if [ "$BATTTEMPC" == $NULL ] || [ "$BATTTEMPC" == $EXCEP ]; then
 				BATTTEMPCC=`echo -ne "\033[31m$BATTTEMPC C°\033[39m"`
-			else
+			elif [ "$BATTTEMPC" -ge 45 ]; then
+				BATTTEMPCC=`echo -ne "\033[31m$BATTTEMPC C°\033[39m"`
+			elif [ "$BATTTEMPC" -le 44 ]; then
 				BATTTEMPCC=`echo -ne "\033[32m$BATTTEMPC C°\033[39m"`
+			else
+				BATTTEMPCC=`echo -ne "$BATTTEMPC C°"`
 			fi
 
 
-			if [ "$BATTSTATUS" == "Charging" ]; then
+			if [ "$BATTSTATUS" == $NULL ] || [ "$BATTSTATUS" == $EXCEP ]; then
+				BATTCURRENTMAC=`echo -ne "\033[31m$BATTCURRENTMA"" mA""\033[39m"`
+			elif [ "$BATTSTATUS" == "Charging" ]; then
 				BATTCURRENTMAC=`echo -ne "\033[32m$BATTCURRENTMA"" mA""\033[39m"`
 			elif [ "$BATTSTATUS" == "Discharging" ]; then
 				BATTCURRENTMAC=`echo -ne "\033[31m$BATTCURRENTMA"" mA""\033[39m"`
@@ -331,7 +377,9 @@ if [ "$AWKCOMMEXIST" != 127 ]; then
 			fi
 
 
-			if [ "$BATTCAPACITY" -le "30" ] && [ "$BATTCAPACITY" -ge "16" ]; then
+			if [ "$BATTCAPACITY" == $NULL ] || [ "$BATTCAPACITY" == $EXCEP ]; then
+				BATTCAPACITYC=`echo -ne "\033[31m$BATTCAPACITY""%""\033[39m"`
+			elif [ "$BATTCAPACITY" -le "30" ] && [ "$BATTCAPACITY" -ge "16" ]; then
 				BATTCAPACITYC=`echo -ne "\033[33m$BATTCAPACITY""%""\033[39m"`
 			elif [ "$BATTCAPACITY" -le "15" ]; then
 				BATTCAPACITYC=`echo -ne "\033[31m$BATTCAPACITY""%""\033[39m"`
@@ -344,7 +392,9 @@ if [ "$AWKCOMMEXIST" != 127 ]; then
 			fi
 
 
-			if [ "$BATTVOLTAGEMV" -le "3599" ]; then
+			if [ "$BATTVOLTAGEMV" == $NULL ] || [ "$BATTVOLTAGEMV" == $EXCEP ]; then
+				BATTVOLTAGEMVC=`echo -ne "\033[31m$BATTVOLTAGEMV"" mV""\033[39m"`
+			elif [ "$BATTVOLTAGEMV" -le "3599" ]; then
 				BATTVOLTAGEMVC=`echo -ne "\033[31m$BATTVOLTAGEMV"" mV""\033[39m"`
 			elif [ "$BATTVOLTAGEMV" -ge "3600" ] && [ "$BATTVOLTAGEMV" -le "3749" ]; then
 				BATTVOLTAGEMVC=`echo -ne "\033[33m$BATTVOLTAGEMV"" mV""\033[39m"`
@@ -352,6 +402,8 @@ if [ "$AWKCOMMEXIST" != 127 ]; then
 				BATTVOLTAGEMVC=`echo -ne "\033[32m$BATTVOLTAGEMV"" mV""\033[39m"`
 			elif [ "$BATTVOLTAGEMV" -ge "4200" ] ; then
 				BATTVOLTAGEMVC=`echo -ne "\033[36m$BATTVOLTAGEMV"" mV""\033[39m"`
+			else
+				BATTVOLTAGEMVC=`echo -ne "$BATTVOLTAGEMV"" mV"`
 			fi
 
 
