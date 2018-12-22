@@ -1,6 +1,6 @@
 #!/system/bin/sh
 
-awk 2>&1
+awk > /dev/null 2>&1
 AWKCOMMEXIST=$?
 
 if [ "$AWKCOMMEXIST" != 127 ]; then
