@@ -356,13 +356,13 @@ if [ "$AWKCOMMEXIST" != 127 ]; then
 
 
 			if [ "$BATTTEMPC" == $NULL ] || [ "$BATTTEMPC" == $EXCEP ]; then
-				BATTTEMPCC=`echo -ne "\033[31m$BATTTEMPC C°\033[39m"`
+				BATTTEMPCC=`echo -ne "\033[31m$BATTTEMPC CÂ°\033[39m"`
 			elif [ "$BATTTEMPC" -ge 45 ]; then
-				BATTTEMPCC=`echo -ne "\033[31m$BATTTEMPC C°\033[39m"`
+				BATTTEMPCC=`echo -ne "\033[31m$BATTTEMPC CÂ°\033[39m"`
 			elif [ "$BATTTEMPC" -le 44 ]; then
-				BATTTEMPCC=`echo -ne "\033[32m$BATTTEMPC C°\033[39m"`
+				BATTTEMPCC=`echo -ne "\033[32m$BATTTEMPC CÂ°\033[39m"`
 			else
-				BATTTEMPCC=`echo -n "$BATTTEMPC C°"`
+				BATTTEMPCC=`echo -n "$BATTTEMPC CÂ°"`
 			fi
 
 
