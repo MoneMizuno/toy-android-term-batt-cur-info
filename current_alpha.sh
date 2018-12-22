@@ -279,7 +279,7 @@ if [ "$AWKCOMMEXIST" != 127 ]; then
 
 			if [ "$STATUSVALEFF" == 0 ]; then
 				BATTSTATUS=`cat $SYSPOWPATH$BATTERYPATH$STATUSVAL`
-				if [ -z $BATTSTATUS ];then
+				if [ -z "$BATTSTATUS" ];then
 					BATTSTATUS=$EXCEP
 				fi
 			else
@@ -289,7 +289,7 @@ if [ "$AWKCOMMEXIST" != 127 ]; then
 
 			if [ "$CHARGETYPEVALEFF" == 0 ]; then
 				BATTCHARGETYPE=`cat $SYSPOWPATH$BATTERYPATH$CHARGETYPEVAL`
-				if [ -z $BATTCHARGETYPE ];then
+				if [ -z "$BATTCHARGETYPE" ];then
 					BATTCHARGETYPE=$EXCEP
 				fi
 			else
@@ -356,18 +356,20 @@ if [ "$AWKCOMMEXIST" != 127 ]; then
 
 
 			if [ "$BATTTEMPC" == $NULL ] || [ "$BATTTEMPC" == $EXCEP ]; then
-				BATTTEMPCC=`echo -ne "\033[31m$BATTTEMPC CÂ°\033[39m"`
+				BATTTEMPCC=`echo -ne "\033[31m$BATTTEMPC C°\033[39m"`
 			elif [ "$BATTTEMPC" -ge 45 ]; then
-				BATTTEMPCC=`echo -ne "\033[31m$BATTTEMPC CÂ°\033[39m"`
+				BATTTEMPCC=`echo -ne "\033[31m$BATTTEMPC C°\033[39m"`
 			elif [ "$BATTTEMPC" -le 44 ]; then
-				BATTTEMPCC=`echo -ne "\033[32m$BATTTEMPC CÂ°\033[39m"`
+				BATTTEMPCC=`echo -ne "\033[32m$BATTTEMPC C°\033[39m"`
 			else
-				BATTTEMPCC=`echo -ne "$BATTTEMPC CÂ°"`
+				BATTTEMPCC=`echo -n "$BATTTEMPC C°"`
 			fi
 
 
 			if [ "$BATTSTATUS" == $NULL ] || [ "$BATTSTATUS" == $EXCEP ]; then
 				BATTCURRENTMAC=`echo -ne "\033[31m$BATTCURRENTMA"" mA""\033[39m"`
+			elif [ "$BATTSTATUS" == "Full" ]; then
+				BATTCURRENTMAC=`echo -ne "\033[36m$BATTCURRENTMA"" mA""\033[39m"`
 			elif [ "$BATTSTATUS" == "Charging" ]; then
 				BATTCURRENTMAC=`echo -ne "\033[32m$BATTCURRENTMA"" mA""\033[39m"`
 			elif [ "$BATTSTATUS" == "Discharging" ]; then
@@ -403,7 +405,7 @@ if [ "$AWKCOMMEXIST" != 127 ]; then
 			elif [ "$BATTVOLTAGEMV" -ge "4200" ] ; then
 				BATTVOLTAGEMVC=`echo -ne "\033[36m$BATTVOLTAGEMV"" mV""\033[39m"`
 			else
-				BATTVOLTAGEMVC=`echo -ne "$BATTVOLTAGEMV"" mV"`
+				BATTVOLTAGEMVC=`echo -n "$BATTVOLTAGEMV"" mV"`
 			fi
 
 
