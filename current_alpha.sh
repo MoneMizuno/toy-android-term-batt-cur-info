@@ -185,7 +185,7 @@ if [ "$AWKCOMMEXIST" != 127 ]; then
 	if [ "$CURRENTFORMATVALEXIST" != 0 ]; then
 		BATTSTATUS=`cat $SYSPOWPATH$BATTERYPATH$STATUSVAL`
 		BATTCURRENT=`cat $SYSPOWPATH$BATTERYPATH$CURRENTVAL`
-		if [ "$BATTSTATUS" == Charging ]; then
+		if [ "$BATTSTATUS" == Charging ] || [ "$BATTSTATUS" == Full ]; then
 			echo "Please stop charging to determine the current supply method."
 			until [ "$BATTSTATUS" == Discharging ]
 			do
