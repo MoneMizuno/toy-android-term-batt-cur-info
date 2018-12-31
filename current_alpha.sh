@@ -55,21 +55,20 @@ if [ "$AWKCOMMEXIST" != 127 ]; then
 
 	# Check if the directory exists.
 
-	ls $SYSPOWPATH$BATTPATH > /dev/null 2>&1
-	BATTPATHEXIST=$?
-	ls $SYSPOWPATH$BMSPATH > /dev/null 2>&1
-	BMSPATHEXIST=$?
+	grep 'BATTDIR=' ./batt_config > /dev/null 2>&1
+	BATTVALEXIST=$?
 
-	if [ "$BATTPATHEXIST" == 0 ]; then
+if [ BATTVALEXIST == 0 ];then
+	BATTERYPATH=`grep 'BATTDIR=' ./batt_config | awk 'BEGIN {FS="="}''{print $2}'`
+else	
+	if [ -d $SYSPOWPATH$BATTPATH ] && [ -r $SYSPOWPATH$BATTPATH ]; then
 		BATTERYPATH=$BATTPATH
-	elif [ "$BMSPATHEXIST" == 0 ]; then
+	elif [ -d $SYSPOWPATH$BMSPATH ] && [ -r $SYSPOWPATH$BMSPATH ]; then
 		BATTERYPATH=$BMSPATH
 	else
 		BATTERYPATH=$UNKNOWN
 	fi
-
-	ls $SYSPOWPATH$BATTERYPATH > /dev/null 2>&1
-	BATTERYPATHEXIST=$?
+fi
 
 	# Check if the battery information file exists.
 
@@ -108,6 +107,10 @@ if [ "$AWKCOMMEXIST" != 127 ]; then
 	CURRENTFORMATVALEXIST=$?
 
 	# Set the configuration.
+
+	if [ "$BATTVALEXIST" != 0 ]; then
+			echo "BATTDIR=$BATTERYPATH" >> ./batt_config
+	fi
 
 	if [ "$TEMPVALEXIST" != 0 ]; then
 		if [ "$TEMPOFEXIST" == 0 ]; then
@@ -257,7 +260,7 @@ if [ "$AWKCOMMEXIST" != 127 ]; then
 
 	# Battery information printing.
 
-	if [ "$BATTERYPATHEXIST" == 0 ]; then
+	if [ -d $SYSPOWPATH$BATTERYPATH ] && [ -r $SYSPOWPATH$BATTERYPATH ]; then
 
 		echo "Battery status: "
 
